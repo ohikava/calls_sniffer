@@ -1,5 +1,9 @@
 import re 
+
+
 solAddress = r"[a-zA-Z0-9]{44}"
+
+
 def extractTokenAddress(row):
     res = []
     tokens = row.replace("\n", " ").split(" ")
@@ -8,4 +12,4 @@ def extractTokenAddress(row):
             if re.fullmatch(solAddress, p):
                 res.append(p)
             
-    return res 
+    return res

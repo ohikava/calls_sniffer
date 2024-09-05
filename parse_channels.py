@@ -1,15 +1,11 @@
-from time import sleep
 from telethon import TelegramClient, events
 from loguru import logger
 from telethon.events.newmessage import EventCommon
 from typing import List
 from dotenv import dotenv_values
-import tomllib
-
-from utils.funcs import load_urls 
-from utils.types import Config, NetworkName, State
-from utils.sniper import Sniper
-from utils.parser import extractTokenAddress, extractTokenInfo
+import json 
+from utils import extractTokenAddress, filterNonTokens
+import requests
 
 with open("sources.txt") as file:
     srcs = file.readlines()
@@ -29,7 +25,35 @@ def handle_messages(url: str):
     async def _(event: EventCommon):
         msg = event.raw_text
 
-        # DO SMTH
+        extracted = extractTokenAddress(msg)
+        solana_addresses = extracted['solana']
+        eth_addresses = extracted['eth']
+
+        res = []
+        for address in solana_addresses:
+            # if not filterNonTokens(address):
+            #     continue 
+            res.append({
+                "channel": url,
+                "msg": msg,
+                "CA": address,
+                "network": "SOLANA"
+            })
+
+        for address in eth_addresses:
+            # if not filterNonTokens(address, net="ETH"):
+            #     continue 
+            res.append({
+                "channel": url,
+                "msg": msg,
+                "CA": address,
+                "network": "ETH"
+            })
+        if res:
+            with open("save.jsonl", "a") as file:
+                for i in res:
+                    file.write(json.dumps(i) + "\n")
+
     return _ 
 
 for url in srcs:

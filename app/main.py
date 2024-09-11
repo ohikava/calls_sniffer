@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from dotenv import dotenv_values
-from redis.asyncio import Redis
+from redis.asyncio import BlockingConnectionPool, Redis
 from telethon import events, TelegramClient
 
 from app.handlers.new_message import handler as new_message_handler
@@ -20,11 +20,10 @@ async def main() -> None:
 
     API_ID = secrets["API_ID"]
     API_HASH = secrets["API_HASH"]
-    TG_TOKEN = secrets["TG_TOKEN"]
 
     client = TelegramClient("anon", API_ID, API_HASH)
 
-    redis_client = Redis(host="localhost", port=6379)
+    redis_client = Redis(host="localhost", port=6379, connection_pool=BlockingConnectionPool(10))
 
     client.add_event_handler(new_message_handler(redis_client), events.NewMessage(chats=urls))
 

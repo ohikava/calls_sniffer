@@ -20,7 +20,6 @@ async def main() -> None:
 
     API_ID = secrets["API_ID"]
     API_HASH = secrets["API_HASH"]
-    TG_TOKEN = secrets["TG_TOKEN"]
 
     client = TelegramClient("anon", API_ID, API_HASH)
 

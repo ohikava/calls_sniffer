@@ -18,38 +18,42 @@ def handler(redis: Redis) -> Callable[[EventCommon], Awaitable[None]]:
         res = {}
         for address in solana_addresses:
             if res.get(address) is None:
-                res[address] = {
-                    "channel": event.chat_id,
-                    "msg": msg,
-                    "network": "SOLANA",
-                }
-            
-            res[address].append(
-                {
-                    "channel": event.chat_id,
-                    "msg": msg,
-                    "network": "SOLANA"
-                }
-            )
+                res[address] = [
+                    {
+                        "channel": event.chat_id,
+                        "msg": msg,
+                        "network": "SOLANA",
+                    }
+                ]
+            else:
+                res[address].append(
+                    {
+                        "channel": event.chat_id,
+                        "msg": msg,
+                        "network": "SOLANA"
+                    }
+                )
 
         for address in eth_addresses:
             if res.get(address) is None:
-                res[address] = {
-                    "channel": event.chat_id,
-                    "msg": msg,
-                    "network": "ETH",
-                }
-            
-            res[address].append(
-                {
-                    "channel": event.chat_id,
-                    "msg": msg,
-                    "network": "ETH"
-                }
-            )
+                res[address] = [
+                    {
+                        "channel": event.chat_id,
+                        "msg": msg,
+                        "network": "ETH",
+                    }
+                ]
+            else:
+                res[address].append(
+                    {
+                        "channel": event.chat_id,
+                        "msg": msg,
+                        "network": "ETH"
+                    }
+                )
 
         for address, mentions in res.items():
-            await redis.lpush(address, dump_mentions(mentions))
+            await redis.lpush(address, *dump_mentions(mentions))
 
     return wrapped
 
